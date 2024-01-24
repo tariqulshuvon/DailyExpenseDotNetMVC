@@ -47,17 +47,23 @@
                 <div class="modal-body">
                     <div style="text-align: center;">
                         <div style="display: inline-block; text-align: left;">
-                            <span style="padding: 10px;">From Date: <input type="text" class="form-group" id="PtxtfrmDate" /></span>
-                            <span style="padding: 10px;">To Date: <input type="text" class="form-group" id="PtxttoDate" /></span>
-                            <span style="padding: 10px;"><button class="btn btn-info" id="PbtnSrc">Search</button></span>
+                            
+                            @*<span style="padding: 10px;"><button class="btn btn-info" id="PbtnSrc">Search</button></span>*@
                         </div>
                     </div>
                     <hr style="border:1px solid" />
                     <div>
+                        <div class="row">
+                            <div class="col-lg-12" style="text-align:center">
+                                <div>
+                                    <label for="txtName">Name: </label>
+                                    <input type="text" name="txtName" id="txtName" placeholder="Enter Name..." onkeypress="return ExpDetailsHelper.isDeciaml(this, event, 2)"/>
+                                </div>
+                            </div>
+                        </div>
 
 
-
-                        <table id="tblGpList" class="display responsive nowrap" style="width: 100%;font-size: 10px;">
+                        @*<table id="tblGpList" class="display responsive nowrap" style="width: 100%;font-size: 10px;">
                             <thead>
                                 <tr>
                                     <th>SL</th>
@@ -66,7 +72,7 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                        </table>
+                        </table>*@
 
                     </div>
                 </div>
