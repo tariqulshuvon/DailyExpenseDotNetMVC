@@ -1,21 +1,7 @@
-﻿$(function () {
-
-    $(document).ready(function () {
-
-        $("table, tr, td, th").css({
-            "border": "1px solid black",
-            "border-collapse": "collapse",
-            "margin": "2px",
-            "padding": "2px",
-            "text-align": "center"
-        });
-        var tbldata = [
-            { "SL": 1, "Name": "John", "Item": "Widget", "Qty": 5, "Rate": 10, "Value": 50 },
-            { "SL": 2, "Name": "Jane", "Item": "Gadget", "Qty": 3, "Rate": 15, "Value": 45 },
-        ];
-
-        $('#tblExpD').DataTable({
-            data: tbldata,
+﻿
+var ExpDetailsHelper = {
+    initDataTable: function () {
+        return $('#tblExpD').DataTable({
             "responsive": true,
             "bDestroy": true,
             "columns": [
@@ -38,139 +24,182 @@
                 {
                     "targets": [6],
                     "render": function (data, type, row, meta) {
-                        return '<button type="button" class="button" onclick="SaveHelper.ViewCaseStudyDetails(' + meta.row + ')" > View</button>'
+                        return '<button type="button" class="button" onclick="ExpDetailsHelper.clearDataTable(' + meta.row + ')" > Cancel</button> <button type="button" class="button" onclick="ExpDetailsHelper.saveDataTable(' + meta.row + ')" > Save</button>'
                     }
                 }
             ],
         });
+    },
 
+    clearDataTable: function (rowIndex) {
+        var table = ExpDetailsHelper.initDataTable();
+        table.row(rowIndex).remove().draw();
+    },
 
+    initDatePicker: function () {
+        $("#showToday").datepicker({ format: "dd-M-yyyy", autoclose: true });
+        $("#showToday").datepicker("setDate", "1").val('');
+    },
 
+    calculateValue: function () {
+        var qty = parseFloat($("#txtQty").val()) || 0;
+        var rate = parseFloat($("#txtRate").val()) || 0;
+        var value = qty * rate;
+
+        $("#txtValue").val(value.toFixed(2));
+    },
+
+    initEvents: function () {
+        $("#btnCloseModal").click(function () {
+            ExpDetailsHelper.modalCloseSweetAlert();
+        });
         $("#btnModal").click(function () {
             $("#myModal").modal("show");
-
-        });
-        $("#PbtnSrc").click(function () {
-            SaveHelper.GetGPList();
         });
 
         $("#closeModal").click(function () {
             $("#myModal").modal("hide");
-
         });
 
-        var today = new Date();
+        $("#btnAddToTable").click(function () {
 
-        var formattedDate = today.getDate() + '/' + (today.getMonth() + 1)  + '/' + today.getFullYear();
+            ExpDetailsHelper.tblAddingSweetAlert();
+        });
+        $("#btnClrModal").click(function () {
+            ExpDetailsHelper.modalClearSweetAlert();
+        });
 
-        $("#showToday").text("Date: " + formattedDate);
         $("#showToday").css({
-            "font-size":"20px"
-        });
-
-
-    });
-});
-
-
-var ExpDetailsHelper = {
-    GetGPList: function () {
-        var frmdate = $("#PtxtfrmDate").val();
-        var todate = $("#PtxttoDate").val();
-        $.getJSON("../Master/GetCaseStudy/?frmdate=" + frmdate + "&todate=" + todate)
-            .done(function (data) {
-                if (data.status == "Logout") {
-                    location.reload();
-                    return;
-                }
-                data = $.parseJSON(data);
-                SaveHelper.BuildCaseStudyList(data.Table);
-                //$("#phide").show();
-            });
-    },
-    BuildCaseStudyList: function (tbldata) {
-        $('#tblGpList').DataTable({
-            data: tbldata,
-            "responsive": true,
-            "bDestroy": true,
-            "columns": [
-                { "data": "ID" },
-                { "data": "CaseStudyNo" },
-                { "data": "AptQuantity" },
-                { "data": null },
-            ],
-            "columnDefs": [
-                {
-                    "targets": [3],
-                    "render": function (data, type, row, meta) {
-                        return '<button type="button" class="button" onclick="SaveHelper.ViewCaseStudyDetails(' + meta.row + ')" > View</button>'
-                    }
-                }
-            ],
+            "font-size": "20px"
         });
     },
 
-    ViewCaseStudyDetails: function (CaseStudyNo) {
-        $("#btnPrint").show();
-        var table = $("#tblGpList").DataTable();
-        var srchid = table.cell(CaseStudyNo, 0).data();
-        SaveHelper.ViewCSDetailByID(srchid, "VIEW");
-    },
-
-    ViewCSDetailByID: function (srchid, typ) {
-        $("#btnPrint").show();
-
-        $.ajax({
-            url: "../Master/GetCaseStudyById/?CaseStudyNo=" + srchid,
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                try {
-                    data = JSON.parse(data);
-                } catch (error) {
-                    console.error("Error parsing JSON: " + error);
-                    return;
-                }
-
-                $("#txtCurrentDate").val(data.Table[0].CurrentDate);
-                $("#aptArea").val(data.Table[0].AptArea);
-                $("#aptPricePerSft").val(data.Table[0].AptPricePerSft);
-                $("#aptQuantity").val(data.Table[0].AptQuantity);
-                $("#aptAmount").val(data.Table[0].AptAmount);
-                $("#aptReceivableAmt").val(data.Table[0].AptReceivableAmt);
-                $("#carParkingQty").val(data.Table[0].CarParkingQty);
-                $("#carParkingAmount").val(data.Table[0].CarParkingAmount);
-                $("#carParkingRcvlAmt").val(data.Table[0].CarParkingRcvlAmt);
-                $("#aCarPakingRcvlAmt").val(data.Table[0].ACarPakingRcvlAmt);
-                $("#totalAmount").val(data.Table[0].TotalAmount);
-                $("#totalAWorkingAmt").val(data.Table[0].TotalAWorkingAmt);
-                $("#costAWorkAmt").val(data.Table[0].CostAWorkAmt);
-                $("#costAWorkRcvlAmt").val(data.Table[0].CostAWorkRcvlAmt);
-                $("#cOmissionWorkAmt").val(data.Table[0].COmissionWorkAmt);
-                $("#cOmissionWorkRcvlAmt").val(data.Table[0].COmissionWorkRcvlAmt);
-                $("#totalValueAfterAdj").val(data.Table[0].TotalValueAfterAdj);
-                $("#reffAcLedgerAmt").val(data.Table[0].ReffAcLedgerAmt);
-                $("#mdfCrgAmt").val(data.Table[0].MdfCrgAmt);
-                $("#adCarParkingAmt").val(data.Table[0].AdCarParkingAmt);
-                $("#totalReceivedAmtA").val(data.Table[0].TotalReceivedAmtA);
-                $("#totalAdjAmtB").val(data.Table[0].TotalAdjAmtB);
-                $("#totalRcvAmtAfterAdjAmtC").val(data.Table[0].TotalRcvAmtAfterAdjAmtC);
-                $("#totalRcvAmtAfterAdjRcvlAmtC").val(data.Table[0].TotalRcvAmtAfterAdjRcvlAmtC);
-                $("#deductionAmtPerCompPolicyPercent").val(data.Table[0].DeductionAmtPerCompPolicyPercent);
-                $("#deductionAmtPerCompPolicyAmt").val(data.Table[0].DeductionAmtPerCompPolicyAmt);
-                $("#deductionAmtPerCompPolicyAdjAmt").val(data.Table[0].DeductionAmtPerCompPolicyAdjAmt);
-                $("#totalRefundableAmtE").val(data.Table[0].TotalRefundableAmtE);
-
-
-
-                $("#myModal").modal("hide");
-            },
-            error: function (xhr, status, error) {
-                console.error("AJAX request failed: " + status + ", " + error);
+    modalClearSweetAlert: function () {
+        swal({
+            title: "Are you sure?",
+            text: "You want to clear the modal data?!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, I am sure!',
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: false,
+            closeOnCancel: false,
+        }, function (isConfirmed) {
+            if (isConfirmed) {
+                swal({
+                    title: 'Cleared!',
+                    text: 'Modal is cleared successfully!',
+                    icon: 'success',
+                    timer: 1000
+                }, function () {
+                    $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
+                });
+            } else {
+                swal("Cancelled", "Model data not cleared", "error");
             }
         });
     },
 
+    modalCloseSweetAlert: function () {
+        swal({
+            title: "Are you sure?",
+            text: "You want to Close the modal data?!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, I am sure!',
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: false,
+            closeOnCancel: false,
+        }, function (isConfirmed) {
+            if (isConfirmed) {
+                swal({
+                    title: 'Cleared!',
+                    text: 'Modal is Closed successfully!',
+                    icon: 'success',
+                    timer: 1000
+                }, function () {
+                    $("#myModal").modal("hide");
+                });
+            } else {
+                swal("Cancelled", "Model not Closed", "error");
+            }
+        });
+    },
+
+    tblAddingSweetAlert: function () {
+        swal({
+            title: "Are you sure?",
+            text: "You want to add this data to the table?!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, I am sure!',
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: false,
+            closeOnCancel: false,
+        }, function (isConfirmed) {
+            if (isConfirmed) {
+                swal({
+                    title: 'Added!',
+                    text: 'Data successfully Added to the table!',
+                    icon: 'success'
+                }, function () {
+                    ExpDetailsHelper.addToTable();
+                });
+            } else {
+            swal("Cancelled", "Data did not Added to the table", "error");
+            }
+        });
+    },
+
+//    {
+//    var form = this;
+
+//    e.preventDefault(); // <--- prevent form from submitting
+
+//    swal({
+//        title: "Are you sure?",
+//        text: "You will not be able to recover this imaginary file!",
+//        icon: "warning",
+//        buttons: [
+//            'No, cancel it!',
+//            'Yes, I am sure!'
+//        ],
+//        dangerMode: true,
+//    }).then(function (isConfirm) {
+//        if (isConfirm) {
+//            swal({
+//                title: 'Shortlisted!',
+//                text: 'Candidates are successfully shortlisted!',
+//                icon: 'success'
+//            }).then(function () {
+//                form.submit(); // <--- submit form programmatically
+//            });
+//        } else {
+//            swal("Cancelled", "Your imaginary file is safe :)", "error");
+//        }
+//    })
+//});
+
+
+    addToTable: function () {
+        var table = ExpDetailsHelper.initDataTable();
+
+        table.row.add({
+            "SL": table.data().count() + 1,
+            "Name": $("#txtName").val(),
+            "Item": $("#txtItem").val(),
+            "Qty": $("#txtQty").val(),
+            "Rate": $("#txtRate").val(),
+            "Value": parseFloat($("#txtQty").val()) * parseFloat($("#txtRate").val()),
+        }).draw(false);
+
+        $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
+
+        $("#myModal").modal("show");
+    },
 
     getSelectionStart: function (o) {
         if (o.createTextRange) {
@@ -192,7 +221,7 @@ var ExpDetailsHelper = {
             return false;
         }
         //get the carat position
-        var caratPos = SaveHelper.getSelectionStart(el);
+        var caratPos = ExpDetailsHelper.getSelectionStart(el);
         var dotPos = el.value.indexOf(".");
         if (caratPos > dotPos && dotPos > -1 && (number[1].length > deci_point - 1)) {
             return false;
@@ -205,111 +234,103 @@ var ExpDetailsHelper = {
         if (code > 31 && (code < 48 || code > 57)) {
             e.preventDefault();
         }
-    },
-
-    SaveCollectionData: function () {
-        var obj = new Object();
-        obj.CurrentDate = $("#txtCurrentDate").val();
-        obj.AptArea = $("#aptArea").val();
-        obj.AptPricePerSft = $("#aptPricePerSft").val();
-        obj.AptQuantity = $("#aptQuantity").val();
-        obj.AptAmount = $("#aptAmount").val();
-        obj.AptReceivableAmt = $("#aptReceivableAmt").val();
-        obj.CarParkingQty = $("#carParkingQty").val();
-        obj.CarParkingAmount = $("#carParkingAmount").val();
-        obj.CarParkingRcvlAmt = $("#carParkingRcvlAmt").val();
-        obj.ACarPakingRcvlAmt = $("#aCarPakingRcvlAmt").val();
-        obj.TotalAmount = $("#totalAmount").val();
-        obj.TotalAWorkingAmt = $("#totalAWorkingAmt").val();
-        obj.CostAWorkAmt = $("#costAWorkAmt").val();
-        obj.CostAWorkRcvlAmt = $("#costAWorkRcvlAmt").val();
-        obj.COmissionWorkAmt = $("#cOmissionWorkAmt").val();
-        obj.COmissionWorkRcvlAmt = $("#cOmissionWorkRcvlAmt").val();
-        obj.TotalValueAfterAdj = $("#totalValueAfterAdj").val();
-        obj.ReffAcLedgerAmt = $("#reffAcLedgerAmt").val();
-        obj.MdfCrgAmt = $("#mdfCrgAmt").val();
-        obj.AdCarParkingAmt = $("#adCarParkingAmt").val();
-        obj.TotalReceivedAmtA = $("#totalReceivedAmtA").val();
-        obj.TotalAdjAmtB = $("#totalAdjAmtB").val();
-        obj.TotalRcvAmtAfterAdjAmtC = $("#totalRcvAmtAfterAdjAmtC").val();
-        obj.TotalRcvAmtAfterAdjRcvlAmtC = $("#totalRcvAmtAfterAdjRcvlAmtC").val();
-        obj.DeductionAmtPerCompPolicyPercent = $("#deductionAmtPerCompPolicyPercent").val();
-        obj.DeductionAmtPerCompPolicyAmt = $("#deductionAmtPerCompPolicyAmt").val();
-        obj.DeductionAmtPerCompPolicyAdjAmt = $("#deductionAmtPerCompPolicyAdjAmt").val();
-        obj.TotalRefundableAmtE = $("#totalRefundableAmtE").val();
-
-
-        if (obj.AptPricePerSft.length > 0) {
-
-            var objDetails = JSON.stringify(obj);
-            var jsonParam = "objDetails:" + objDetails;
-            console.log(jsonParam);
-            var serviceUrl = "/Master/SaveAllData";
-            jQuery.ajax({
-                url: serviceUrl,
-                async: false,
-                type: "POST",
-                data: "{" + jsonParam + "}",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    console.log(data.data01);
-                    if (data.status == "Logout") {
-                        location.reload();
-                        return;
-                    }
-                    if (data.data02 == "Y") {
-                        swal({
-                            icon: 'warning',
-                            title: 'Warning!',
-                            text: 'This Page Already used!',
-                            type: "warning",
-                            closeOnConfirm: false,
-                            closeOnCancel: false,
-                            //timer: 2000
-                        })
-                        return;
-                    }
-                    $("#txtReceipt").val(data.data01);
-                    SaveHelper.DisibledOnly();
-                    if (data.status) {
-                        swal({
-                            title: "Congratulation!!",
-                            text: "Save Successfully",
-                            type: "success",
-                            closeOnConfirm: false,
-                            timer: 2000
-                        });
-                        $("#hdnMRNo").val(data.data01);
-                        SaveHelper.BuildtblOthersCollectionDetails("");
-                        document.getElementById('btnMoneyRecept').style.visibility = 'visible';
-                        document.getElementById('btnMoneyRecept2').style.visibility = 'visible';
-
-                    } else {
-                        swal({
-                            title: "Sorry!",
-                            text: "Failed to save!",
-                            type: "error",
-                            closeOnConfirm: false
-                        });
-                    }
-                },
-                error: function (data) {
-                    swal({
-                        title: "Sorry!",
-                        text: "Something Went Wrong !!! \n" + data.statusText,
-                        type: "error",
-                        closeOnConfirm: false
-                    });
-                }
-            });
-
-        } else {
-
-        }
     }
-
-
 };
+
+$(function () {
+
+             $("table, tr, td, th").css({
+            "border": "1px solid black",
+            "border-collapse": "collapse",
+            "margin": "2px",
+            "padding": "2px",
+            "text-align": "center"
+        });
+        ExpDetailsHelper.initDatePicker();
+        var table = ExpDetailsHelper.initDataTable();
+        ExpDetailsHelper.initEvents();
+
+});
+
+
+
+
+
+
+//$(function () {
+//    $(document).ready(function () {
+//        $("#showToday").datepicker({ format: "dd-M-yyyy", autoclose: true });
+
+//        $("table, tr, td, th").css({
+//            "border": "1px solid black",
+//            "border-collapse": "collapse",
+//            "margin": "2px",
+//            "padding": "2px",
+//            "text-align": "center"
+//        });
+
+//        // Initialize DataTable with an empty dataset
+//        var table = $('#tblExpD').DataTable({
+//            "responsive": true,
+//            "bDestroy": true,
+//            "columns": [
+//                { "data": "SL" },
+//                { "data": "Name" },
+//                { "data": "Item" },
+//                { "data": "Qty" },
+//                { "data": "Rate" },
+//                { "data": "Value" },
+//                { "data": null },
+//            ],
+//            "columnDefs": [
+//                {
+//                    "targets": [0],
+//                    "width": "2%",
+//                    render: function (data, type, row, meta) {
+//                        return meta.row + meta.settings._iDisplayStart + 1;
+//                    },
+//                },
+//                {
+//                    "targets": [6],
+//                    "render": function (data, type, row, meta) {
+//                        return '<button type="button" class="button" onclick="SaveHelper.ViewCaseStudyDetails(' + meta.row + ')" > View</button>'
+//                    }
+//                }
+//            ],
+//        });
+
+//        $("#btnModal").click(function () {
+//            $("#myModal").modal("show");
+//        });
+
+//        $("#btnAddToTable").click(function () {
+//            // Get values from modal inputs
+//            var name = $("#txtName").val();
+//            var item = $("#txtItem").val();
+//            var qty = $("#txtQty").val();
+//            var rate = $("#txtRate").val();
+//            var value = qty * rate;
+
+//            // Add a new row to the DataTable
+//            table.row.add({
+//                "SL": table.data().count() + 1,
+//                "Name": name,
+//                "Item": item,
+//                "Qty": qty,
+//                "Rate": rate,
+//                "Value": value,
+//            }).draw(false);
+
+//            // Clear modal inputs
+//            $("#txtName, #txtItem, #txtQty, #txtRate").val('');
+
+//            // Close the modal
+//            $("#myModal").modal("hide");
+//        });
+
+//        // Rest of your code...
+//    });
+//});
+
 
 
