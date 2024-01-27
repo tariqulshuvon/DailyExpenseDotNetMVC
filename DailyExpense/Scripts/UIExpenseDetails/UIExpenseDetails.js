@@ -57,9 +57,9 @@ var ExpDetailsHelper = {
             $("#myModal").modal("show");
         });
 
-        $("#closeModal").click(function () {
-            $("#myModal").modal("hide");
-        });
+        //$("#closeModal").click(function () {
+        //    $("#myModal").modal("hide");
+        //});
 
         $("#btnAddToTable").click(function () {
 
@@ -73,60 +73,55 @@ var ExpDetailsHelper = {
             "font-size": "20px"
         });
     },
-
     modalClearSweetAlert: function () {
-        swal({
-            title: "Are you sure?",
-            text: "You want to clear the modal data?!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: '#DD6B55',
-            confirmButtonText: 'Yes, I am sure!',
-            cancelButtonText: "No, cancel it!",
-            closeOnConfirm: false,
-            closeOnCancel: false,
-        }, function (isConfirmed) {
-            if (isConfirmed) {
+
                 swal({
                     title: 'Cleared!',
-                    text: 'Modal is cleared successfully!',
+                    text: 'Modal data has been cleared successfully!',
+                    type:"success",
                     icon: 'success',
-                    timer: 1000
-                }, function () {
-                    $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
+                    timer: 750,
+                    showConfirmButton: false
                 });
-            } else {
-                swal("Cancelled", "Model data not cleared", "error");
-            }
-        });
+                $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
+            
     },
-
     modalCloseSweetAlert: function () {
         swal({
-            title: "Are you sure?",
-            text: "You want to Close the modal data?!",
+            title: "Close Modal",
+            text: "Are you sure you want to close the modal?",
             type: "warning",
             showCancelButton: true,
             confirmButtonColor: '#DD6B55',
-            confirmButtonText: 'Yes, I am sure!',
-            cancelButtonText: "No, cancel it!",
+            confirmButtonText: 'Yes, close it!',
+            cancelButtonText: "No, cancel!",
             closeOnConfirm: false,
             closeOnCancel: false,
         }, function (isConfirmed) {
             if (isConfirmed) {
                 swal({
-                    title: 'Cleared!',
-                    text: 'Modal is Closed successfully!',
+                    title: 'Closed!',
+                    text: 'Modal has been closed successfully!',
+                    type: "success",
                     icon: 'success',
-                    timer: 1000
-                }, function () {
-                    $("#myModal").modal("hide");
+                    timer: 1500,
+                    showConfirmButton: false
                 });
+                $("#myModal").modal("hide");
             } else {
-                swal("Cancelled", "Model not Closed", "error");
+                swal({
+                    title: "Cancelled",
+                    text: "Modal is not closed",
+                    type: "error",
+                    icon: "error",
+                    timer: 1500, 
+                    showConfirmButton: false 
+                });
             }
         });
     },
+
+
 
     tblAddingSweetAlert: function () {
         swal({
@@ -141,18 +136,28 @@ var ExpDetailsHelper = {
             closeOnCancel: false,
         }, function (isConfirmed) {
             if (isConfirmed) {
+                ExpDetailsHelper.addToTable();
                 swal({
                     title: 'Added!',
                     text: 'Data successfully Added to the table!',
-                    icon: 'success'
-                }, function () {
-                    ExpDetailsHelper.addToTable();
+                    type: "success",
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
                 });
             } else {
-            swal("Cancelled", "Data did not Added to the table", "error");
+                swal({
+                    title: 'Cancelled',
+                    text: 'Data did not Added to the table',
+                    type: "error",
+                    icon: 'error',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             }
         });
     },
+
 
 //    {
 //    var form = this;
