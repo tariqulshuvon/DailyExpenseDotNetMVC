@@ -97,6 +97,8 @@ var ExpDetailsHelper = {
             cancelButtonText: "No, cancel!",
             closeOnConfirm: false,
             closeOnCancel: false,
+            timer: 1000
+
         }, function (isConfirmed) {
             if (isConfirmed) {
                 swal({
@@ -133,7 +135,8 @@ var ExpDetailsHelper = {
             confirmButtonText: 'Yes, I am sure!',
             cancelButtonText: "No, cancel it!",
             closeOnConfirm: false,
-            closeOnCancel: false,
+            closeOnCancel: false
+
         }, function (isConfirmed) {
             if (isConfirmed) {
                 ExpDetailsHelper.addToTable();
