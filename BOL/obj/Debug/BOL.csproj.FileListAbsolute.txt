@@ -1,0 +1,6 @@
+D:\Projects\DailyExpense\BOL\bin\Debug\BOL.dll
+D:\Projects\DailyExpense\BOL\bin\Debug\BOL.pdb
+D:\Projects\DailyExpense\BOL\obj\Debug\BOL.csproj.AssemblyReference.cache
+D:\Projects\DailyExpense\BOL\obj\Debug\BOL.csproj.CoreCompileInputs.cache
+D:\Projects\DailyExpense\BOL\obj\Debug\BOL.dll
+D:\Projects\DailyExpense\BOL\obj\Debug\BOL.pdb

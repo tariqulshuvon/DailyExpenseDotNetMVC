@@ -2,8 +2,10 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "UIExpenseDetails";
+
 }
 <section>
+    <input type="text" class="form-control" id="txtexpNo" value="N"/>
     <div style="height:150px"></div>
 </section>
 <section>
@@ -35,6 +37,13 @@
                             </tr>
                         </thead>
                     </table>
+                </div>
+                <div class="col-md" style="float:right">
+                    <button id="btnSave" class="btn btn-danger" style="float:right">Save</button>
+                </div>
+                <div class="col-md" >
+                    <button id="btnModalExp" class="btn btn-primary" style="float:left">Saved Expenses</button>
+
                 </div>
             </div>
             <div class="col-lg-2"></div>
@@ -112,6 +121,10 @@
                                         <button class="btn btn-danger" style="width:100%" id="btnCloseModal">Close</button>
                                     </div>
                                 </div>
+                                <div class="col-md-12">
+                                    <button class="btn btn-danger" style="width:100%" id="btnSaveToDb">Save To DB</button>
+
+                                </div>
                             </div>
                         </div>
 
@@ -125,6 +138,43 @@
     </div>
 </section>
 
+
+<section>
+    <div id="myModalExpDetails" class="modal fade">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content" style="width:100%;">
+                <div class="modal-header">
+                    <span id="closeModal" type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</span>
+                    <h2 class="modal-title">All Expenses</h2>
+                </div>
+                <div class="modal-body">
+                    @*<div style="text-align: center;">
+                        <div style="display: inline-block; text-align: left;">
+                            <span style="padding: 10px;">From Date: <input type="text" class="form-group" id="PtxtfrmDate" /></span>
+                            <span style="padding: 10px;">To Date: <input type="text" class="form-group" id="PtxttoDate" /></span>
+                            <span style="padding: 10px;"><button class="btn btn-info" id="PbtnSrc">Search</button></span>
+                        </div>
+                    </div>*@
+                    <div>
+                        <table id="tblExpDList" class="display responsive nowrap" style="width: 100%; font-size: 10px;">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Expense No</th>
+                                    <th>Purchaser Name</th>
+                                    <th>Item Name</th>
+                                    <th>Total Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @section Scripts {
     @Scripts.Render("~/Scripts/UIExpenseDetails/UIExpenseDetails.js");

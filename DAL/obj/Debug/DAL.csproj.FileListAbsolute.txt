@@ -1,0 +1,6 @@
+D:\Projects\DailyExpense\DAL\bin\Debug\DAL.dll
+D:\Projects\DailyExpense\DAL\bin\Debug\DAL.pdb
+D:\Projects\DailyExpense\DAL\obj\Debug\DAL.csproj.AssemblyReference.cache
+D:\Projects\DailyExpense\DAL\obj\Debug\DAL.csproj.CoreCompileInputs.cache
+D:\Projects\DailyExpense\DAL\obj\Debug\DAL.dll
+D:\Projects\DailyExpense\DAL\obj\Debug\DAL.pdb
