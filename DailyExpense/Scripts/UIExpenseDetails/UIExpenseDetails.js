@@ -1,4 +1,101 @@
 ﻿
+
+$(function () {
+
+
+    $(document).ready(function () {
+
+
+        $("#showToday").datepicker({ format: "dd-M-yyyy", autoclose: true });
+        $("#showToday").datepicker("setDate", "1");
+
+
+
+
+        $('#myModal').validate({
+            rules: {
+                txtName: {
+                    required: true
+                },
+                txtItem: {
+                    required: true
+                },
+                txtQty: {
+                    required: true,
+                    digits: true
+                },
+                txtRate: {
+                    required: true,
+                    number: true
+                }
+            },
+            messages: {
+                txtName: {
+                    required: "Please enter your name"
+                },
+                txtItem: {
+                    required: "Please enter the item"
+                },
+                txtQty: {
+                    required: "Please enter the quantity",
+                    digits: "Please enter only digits"
+                },
+                txtRate: {
+                    required: "Please enter the rate",
+                    number: "Please enter a valid number"
+                }
+            }
+        });
+    });
+
+
+
+
+
+
+    ExpDetailsHelper.initDataTable();
+
+
+});
+
+$("#btnModal").click(function () {
+    $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
+
+
+    $("#myModal").modal("show");
+});
+
+$("#btnCloseModal").click(function () {
+    ExpDetailsHelper.modalCloseSweetAlert();
+});
+
+$("#btnModalExp").click(function () {
+
+    $("#myModalExpDetails").modal("show");
+    ExpDetailsHelper.GetExpenseDetailsList();
+});
+
+
+
+
+$("#btnAddToTable").click(function () {
+    var name = $("#txtName").val();
+    var item = $("#txtItem").val();
+    var qty = $("#txtQty").val();
+    var rate = $("#txtRate").val();
+    if ((name, item, qty, rate) == '') {
+        ExpDetailsHelper.tblDataNotAddedSweetAlert();
+    } else {
+        ExpDetailsHelper.tblAddingSweetAlert();
+    }
+});
+$("#btnClrModal").click(function () {
+    ExpDetailsHelper.modalClearSweetAlert();
+});
+$("#btnSave").click(function () {
+    ExpDetailsHelper.SaveCollectionData();
+});
+
 var ExpDetailsHelper = {
 
     GetExpenseDetailsList: function () {
@@ -18,8 +115,6 @@ var ExpDetailsHelper = {
             "columns": [
                 { "data": "SL" },
                 { "data": "ExpenseNo" },
-                { "data": "Name" },
-                { "data": "Item" },
                 { "data": "Value" },
                 { "data": null },
             ],
@@ -33,13 +128,27 @@ var ExpDetailsHelper = {
                 },
 
                 {
-                    "targets": [5],
+                    "targets": [3],
                     "render": function (data, type, row, meta) {
-                        return '<button type="button" class="button" id="btnModalExpD" onclick="ExpDetailsHelper.ViewExpDetails(' + meta.row + ')" > View</button>'
-                            + '  ' + '<button id="btnRemove" name="btnRemove" type="button" onclick="ExpDetailsHelper.SearchforItemDelete(' + meta.row + ')" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>'
+                        return '<label><a style="cursor: pointer;" onclick="ExpDetailsHelper.ViewExpDetails(\'' + row.ExpenseNo + '\')">View</a></label>' + ' '+
+                            '<button id="btnRemove" name="btnRemove" type="button" onclick="ExpDetailsHelper.SearchforItemDelete(' + meta.row + ')" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>';
                     }
+
+
                 }
             ],
+            //"footerCallback": function (row, data, start, end, display) {
+            //    var api = this.api();
+            //    var sum = api
+            //        .column(2, { page: 'current' })
+            //        .data()
+            //        .reduce(function (acc, val) {
+            //            return acc + parseFloat(val);
+            //        }, 0);
+
+            //    $(api.column(2).footer()).html('Total: ' + sum);
+            //}
+
         });
     },
 
@@ -78,49 +187,14 @@ var ExpDetailsHelper = {
 
 
     ViewExpDetails: function (ExpenseNo) {
-        var table = $("#tblExpDList").DataTable();
-        var srchid = table.cell(ExpenseNo, 1).data();
+        $("#txtExpNo").val(ExpenseNo);
+        var srchid = ExpenseNo;
         ExpDetailsHelper.ViewExpDetailByID(srchid, "VIEW");
+        $("#myModalExpDetails").modal("hide");
+
     },
 
-//    ViewExpDetailByID: function (srchid, typ) {
-//        //$("#btnPrint").show();
 
-//        $.ajax({
-//            url: "../UIExpenseDetails/GetExpDetailByID/?ExpenseNo=" + srchid,
-//            type: "GET",
-//            dataType: "json",
-//            success: function (data) {
-//                try {
-//                    data = JSON.parse(data);
-//                    ExpDetailsHelper.addToTable();
-//                } catch (error) {
-//                    console.error("Error parsing JSON: " + error);
-//                    return;
-//                }
-
-///*                $("#myModal").modal("show");*/
-//                //$("#txtName").val(data.Table[0].Name);
-//                //$("#txtItem").val(data.Table[0].Item);
-//                //$("#txtQty").val((data.Table[0].Quantity));
-//                //$("#txtRate").val(data.Table[0].Rate);
-//                //$("#txtValue").val(data.Table[0].Value);
-//                //$("#myModalExpDetails").modal("hide");
-
-//                //$("#btnAddToTable").hide();
-//                //$("#btnClrModal").hide();
-//                //$("#btnCloseModal").hide();
-//                //$("#btnSaveToDb").show();
-
-          
-
-
-//            },
-//            error: function (xhr, status, error) {
-//                console.error("AJAX request failed: " + status + ", " + error);
-//            }
-//        });
-//    },
 
     ViewExpDetailByID: function (srchid, typ) {
         $.ajax({
@@ -131,8 +205,8 @@ var ExpDetailsHelper = {
                 try {
                     data = JSON.parse(data);
 
-                                    var formattedDate = moment(data.Table[0].SelectedDate).format("DD-MMM-YYYY");
-                // Set the formatted date to the input field
+                var formattedDate = moment(data.Table[0].SelectedDate).format("DD-MMM-YYYY");
+
                 $("#showToday").val(formattedDate);
                     //$("#showToday").val(data.Table[0].SelectedDate).datepicker({ format: "dd-M-yyyy", autoclose: true });
                     ExpDetailsHelper.addToTable(data.Table);
@@ -156,10 +230,7 @@ var ExpDetailsHelper = {
     },
 
 
-    initDatePicker: function () {
-        $("#showToday").datepicker({ format: "dd-M-yyyy", autoclose: true });
-        $("#showToday").datepicker("setDate", "1").val('');
-    },
+
 
     calculateValue: function () {
         var qty = parseFloat($("#txtQty").val()) || 0;
@@ -175,54 +246,6 @@ var ExpDetailsHelper = {
     },
 
 
-    initEvents: function () {
-        $("#btnCloseModal").click(function () {
-            ExpDetailsHelper.modalCloseSweetAlert();
-        });
-        $("#btnModal").click(function () {
-            $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
-            $("#btnSaveToDb").hide();
-
-            $("#myModal").modal("show");
-        });
-
-        $("#btnModalExp").click(function () {
-
-            $("#myModalExpDetails").modal("show");
-            ExpDetailsHelper.GetExpenseDetailsList();
-        });
-
-        $("#btnSaveToDb").click(function () {
-
-        });
-
-        //$("#closeModal").click(function () {
-        //    $("#myModal").modal("hide");
-        //});
-
-        $("#btnAddToTable").click(function () {
-            var name = $("#txtName").val();
-            var item = $("#txtItem").val();
-            var qty = $("#txtQty").val();
-            var rate = $("#txtRate").val();
-            if ((name, item, qty, rate) == '') {
-                ExpDetailsHelper.tblDataNotAddedSweetAlert();
-            } else {
-                ExpDetailsHelper.tblAddingSweetAlert();
-            }
-        });
-        $("#btnClrModal").click(function () {
-            ExpDetailsHelper.modalClearSweetAlert();
-        });
-        $("#btnSave").click(function () {
-            ExpDetailsHelper.SaveCollectionData();
-        });
-
-        $("#showToday").css({
-            "font-size": "20px"
-        });
-    },
-
     modalClearSweetAlert: function () {
 
                 swal({
@@ -230,7 +253,7 @@ var ExpDetailsHelper = {
                     text: 'Modal data has been cleared successfully!',
                     type:"success",
                     icon: 'success',
-                    timer: 750,
+                    timer: 500,
                     showConfirmButton: false
                 });
                 $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
@@ -255,7 +278,7 @@ var ExpDetailsHelper = {
                     text: 'Modal has been closed successfully!',
                     type: "success",
                     icon: 'success',
-                    timer: 1500,
+                    timer: 700,
                     showConfirmButton: false
                 });
 
@@ -331,6 +354,7 @@ var ExpDetailsHelper = {
 
         var rowData = table.row(rowIndex).data();
 
+        $('#txtExpNo').val(rowData.ExpenseNo);
         $('#txtName').val(rowData.Name);
         $('#txtItem').val(rowData.Item);
         $('#txtQty').val(rowData.Quantity);
@@ -338,7 +362,10 @@ var ExpDetailsHelper = {
         $('#txtValue').val(rowData.Value);
 
         $('#myModal').modal('show');
+
+
     },
+
     addToTable: function (data) {
         var table = ExpDetailsHelper.initDataTable();
         if (data && data.length > 0) {
@@ -377,42 +404,12 @@ var ExpDetailsHelper = {
 
     },
 
-    //addToTable: function () {
-    //    var table = ExpDetailsHelper.initDataTable();
-    //    var name = $("#txtName").val();
-    //    var item = $("#txtItem").val();
-    //    var qty = $("#txtQty").val();
-    //    var rate = $("#txtRate").val();
-    //    var value = parseFloat(qty) * parseFloat(rate);
-
-    //    var existingRow = table.rows().indexes().filter(function (value, index) {
-    //        var rowData = table.row(value).data();
-    //        return (
-    //            rowData.Name === name &&
-    //            rowData.Item === item &&
-    //            rowData.Qty === qty &&
-    //            rowData.Rate === rate
-    //        );
-    //    });
-
-    //    if ((name, item, qty, rate) != '') {
-    //        if (existingRow.length === 0) {
-    //            table.row.add({
-    //                "SL": table.data().count() + 1,
-    //                "Name": name,
-    //                "Item": item,
-    //                "Qty": qty,
-    //                "Rate": rate,
-    //                "Value": value
-    //            }).draw(false);
-    //        }
-    //    }
-    //},
 
     SaveCollectionData: function () {
 
         var obj = new Object();
         obj.SelectedDate = $("#showToday").val();
+        obj.expNo = $("#txtExpNo").val();
 
 
             var listitem = ExpDetailsHelper.CreateUnitObject();
@@ -432,8 +429,12 @@ var ExpDetailsHelper = {
                     contentType: "application/json; charset=utf-8",
                     success: function (data) {
                         if (data.status) {
-                            var table = $('#tblExpD').DataTable();
-                            table.clear().draw();
+                            //alert(data.data01);
+                            //var table = $('#tblExpD').DataTable();
+                            //table.clear().draw();
+                           
+                            $('#lblExpNo').val(data.data01);
+                            $('#txtExpNo').val(data.data01);
                             swal({
                                 title: "Congratulation!!",
                                 text: "Save Successfully",
@@ -479,7 +480,7 @@ var ExpDetailsHelper = {
         var datalist = [];
 
         for (var j = 0; j < detaildata.length; j++) {
-            var obj = new Object();
+            var obj = new Object();           
             obj.Name = table.cell(j, 1).data();
             obj.Item = table.cell(j, 2).data();
             obj.Qty = parseInt(table.cell(j, 3).data());
@@ -529,259 +530,8 @@ var ExpDetailsHelper = {
     }
 };
 
-$(function () {
-
-             $("table, tr, td, th").css({
-            "border": "1px solid black",
-            "border-collapse": "collapse",
-            "margin": "2px",
-            "padding": "2px",
-            "text-align": "center"
-             });
 
 
-        ExpDetailsHelper.initDatePicker();
-        var table = ExpDetailsHelper.initDataTable();
-        ExpDetailsHelper.initEvents();
-
-
-});
-
-
-
-
-    //addToTable: function () {
-    //    var table = ExpDetailsHelper.initDataTable();
-
-    //    table.row.add({
-    //        "SL": table.data().count() + 1,
-    //        "Name": $("#txtName").val(),
-    //        "Item": $("#txtItem").val(),
-    //        "Qty": $("#txtQty").val(),
-    //        "Rate": $("#txtRate").val(),
-    //        "Value": parseFloat($("#txtQty").val()) * parseFloat($("#txtRate").val()),
-    //    }).draw(false);
-
-    //    $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
-
-    //    $("#myModal").modal("show");
-    //},
-
-    //SaveCollectionData: function () {
-    //    var tableData = [];
-    //    var table = $('#tblExpD').DataTable();
-    //    var SelectedDate = $("#showToday").val();
-
-    //    table.rows().every(function () {
-    //        var rowData = {
-
-    //            Name: this.data()[1],
-    //            Item: this.data()[2],
-    //            Qty: this.data()[3],
-    //            Rate: this.data()[4],
-    //            Value: this.data()[5]
-    //        };
-    //        tableData.push(rowData);
-    //    });
-
-    //    var objDetails = {
-    //        SelectedDate : SelectedDate,
-    //        tableData: tableData
-    //    };
-
-    //    jQuery.ajax({
-    //        url: '/UIExpenseDetails/SaveAllData',
-    //        async: false,
-    //        type: 'POST',
-    //        dataType: "json",
-    //        contentType: 'application/json; charset=utf-8',
-    //        data: JSON.stringify(objDetails),
-    //        success: function (response) {
-    //            console.log(response);
-    //        },
-    //        error: function (xhr, status, error) {
-    //            console.error(error);
-    //        }
-    //    });
-    //},
-
-
-    //SaveCollectionData: function () {
-    //    var obj = new Object();
-    //    obj.CurrentDate = $("#txtCurrentDate").val();
-    //    obj.AptArea = $("#aptArea").val();
-    //    obj.AptPricePerSft = $("#aptPricePerSft").val();
-    //    obj.AptQuantity = $("#aptQuantity").val();
-    //    obj.AptAmount = $("#aptAmount").val();
-    //    obj.AptReceivableAmt = $("#aptReceivableAmt").val();
-    //    obj.CarParkingQty = $("#carParkingQty").val();
-    //    obj.CarParkingAmount = $("#carParkingAmount").val();
-    //    obj.CarParkingRcvlAmt = $("#carParkingRcvlAmt").val();
-    //    obj.ACarPakingRcvlAmt = $("#aCarPakingRcvlAmt").val();
-    //    obj.TotalAmount = $("#totalAmount").val();
-    //    obj.TotalAWorkingAmt = $("#totalAWorkingAmt").val();
-    //    obj.CostAWorkAmt = $("#costAWorkAmt").val();
-    //    obj.CostAWorkRcvlAmt = $("#costAWorkRcvlAmt").val();
-    //    obj.COmissionWorkAmt = $("#cOmissionWorkAmt").val();
-    //    obj.COmissionWorkRcvlAmt = $("#cOmissionWorkRcvlAmt").val();
-    //    obj.TotalValueAfterAdj = $("#totalValueAfterAdj").val();
-    //    obj.ReffAcLedgerAmt = $("#reffAcLedgerAmt").val();
-    //    obj.MdfCrgAmt = $("#mdfCrgAmt").val();
-    //    obj.AdCarParkingAmt = $("#adCarParkingAmt").val();
-    //    obj.TotalReceivedAmtA = $("#totalReceivedAmtA").val();
-    //    obj.TotalAdjAmtB = $("#totalAdjAmtB").val();
-    //    obj.TotalRcvAmtAfterAdjAmtC = $("#totalRcvAmtAfterAdjAmtC").val();
-    //    obj.TotalRcvAmtAfterAdjRcvlAmtC = $("#totalRcvAmtAfterAdjRcvlAmtC").val();
-    //    obj.DeductionAmtPerCompPolicyPercent = $("#deductionAmtPerCompPolicyPercent").val();
-    //    obj.DeductionAmtPerCompPolicyAmt = $("#deductionAmtPerCompPolicyAmt").val();
-    //    obj.DeductionAmtPerCompPolicyAdjAmt = $("#deductionAmtPerCompPolicyAdjAmt").val();
-    //    obj.TotalRefundableAmtE = $("#totalRefundableAmtE").val();
-
-
-    //    if (obj.AptPricePerSft.length > 0) {
-
-    //        var objDetails = JSON.stringify(obj);
-    //        var jsonParam = "objDetails:" + objDetails;
-    //        console.log(jsonParam);
-    //        var serviceUrl = "/Master/SaveAllData";
-    //        jQuery.ajax({
-    //            url: serviceUrl,
-    //            async: false,
-    //            type: "POST",
-    //            data: "{" + jsonParam + "}",
-    //            dataType: "json",
-    //            contentType: "application/json; charset=utf-8",
-    //            success: function (data) {
-    //                console.log(data.data01);
-    //                if (data.status == "Logout") {
-    //                    location.reload();
-    //                    return;
-    //                }
-    //                if (data.data02 == "Y") {
-    //                    swal({
-    //                        icon: 'warning',
-    //                        title: 'Warning!',
-    //                        text: 'This Page Already used!',
-    //                        type: "warning",
-    //                        closeOnConfirm: false,
-    //                        closeOnCancel: false,
-    //                        //timer: 2000
-    //                    })
-    //                    return;
-    //                }
-    //                $("#txtReceipt").val(data.data01);
-    //                SaveHelper.DisibledOnly();
-    //                if (data.status) {
-    //                    swal({
-    //                        title: "Congratulation!!",
-    //                        text: "Save Successfully",
-    //                        type: "success",
-    //                        closeOnConfirm: false,
-    //                        timer: 2000
-    //                    });
-    //                    $("#hdnMRNo").val(data.data01);
-    //                    SaveHelper.BuildtblOthersCollectionDetails("");
-    //                    document.getElementById('btnMoneyRecept').style.visibility = 'visible';
-    //                    document.getElementById('btnMoneyRecept2').style.visibility = 'visible';
-
-    //                } else {
-    //                    swal({
-    //                        title: "Sorry!",
-    //                        text: "Failed to save!",
-    //                        type: "error",
-    //                        closeOnConfirm: false
-    //                    });
-    //                }
-    //            },
-    //            error: function (data) {
-    //                swal({
-    //                    title: "Sorry!",
-    //                    text: "Something Went Wrong !!! \n" + data.statusText,
-    //                    type: "error",
-    //                    closeOnConfirm: false
-    //                });
-    //            }
-    //        });
-
-    //    } else {
-
-    //    }
-    //},
-
-//$(function () {
-//    $(document).ready(function () {
-//        $("#showToday").datepicker({ format: "dd-M-yyyy", autoclose: true });
-
-//        $("table, tr, td, th").css({
-//            "border": "1px solid black",
-//            "border-collapse": "collapse",
-//            "margin": "2px",
-//            "padding": "2px",
-//            "text-align": "center"
-//        });
-
-//        // Initialize DataTable with an empty dataset
-//        var table = $('#tblExpD').DataTable({
-//            "responsive": true,
-//            "bDestroy": true,
-//            "columns": [
-//                { "data": "SL" },
-//                { "data": "Name" },
-//                { "data": "Item" },
-//                { "data": "Qty" },
-//                { "data": "Rate" },
-//                { "data": "Value" },
-//                { "data": null },
-//            ],
-//            "columnDefs": [
-//                {
-//                    "targets": [0],
-//                    "width": "2%",
-//                    render: function (data, type, row, meta) {
-//                        return meta.row + meta.settings._iDisplayStart + 1;
-//                    },
-//                },
-//                {
-//                    "targets": [6],
-//                    "render": function (data, type, row, meta) {
-//                        return '<button type="button" class="button" onclick="SaveHelper.ViewCaseStudyDetails(' + meta.row + ')" > View</button>'
-//                    }
-//                }
-//            ],
-//        });
-
-//        $("#btnModal").click(function () {
-//            $("#myModal").modal("show");
-//        });
-
-//        $("#btnAddToTable").click(function () {
-//            // Get values from modal inputs
-//            var name = $("#txtName").val();
-//            var item = $("#txtItem").val();
-//            var qty = $("#txtQty").val();
-//            var rate = $("#txtRate").val();
-//            var value = qty * rate;
-
-//            // Add a new row to the DataTable
-//            table.row.add({
-//                "SL": table.data().count() + 1,
-//                "Name": name,
-//                "Item": item,
-//                "Qty": qty,
-//                "Rate": rate,
-//                "Value": value,
-//            }).draw(false);
-
-//            // Clear modal inputs
-//            $("#txtName, #txtItem, #txtQty, #txtRate").val('');
-
-//            // Close the modal
-//            $("#myModal").modal("hide");
-//        });
-
-//        // Rest of your code...
-//    });
-//});
 
 
 

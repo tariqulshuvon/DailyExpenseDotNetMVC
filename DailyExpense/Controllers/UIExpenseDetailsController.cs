@@ -22,7 +22,7 @@ namespace DailyExpense.Controllers
 
         public JsonResult SaveAllData(ExpDate objDetails, List<DailyExpenseDetails> ItemList)
         {
-
+            string EXPNO = "";
             bool status = false;
             DataTable itemListdt = new DataTable();
 
@@ -44,18 +44,20 @@ namespace DailyExpense.Controllers
             dstrnd.Tables.Add(itemListdt);
 
             ds = common.select_data_20X("", "SP_ENTRY_DailyExpDetails", "Save_ExpDetails", dstrnd, null, objDetails.SelectedDate, objDetails.expNo);
-
+                       
             if (ds.Tables[0].Rows.Count > 0)
             {
+                EXPNO = ds.Tables[0].Rows[0]["EXPNO"].ToString();
+               // SRCTRANNO = ds.Tables[0].Rows[0]["SRCTRNNO"].ToString();
                 status = true;
             }
             else
             {
                 status = false;
             }
+            return new JsonResult { Data = new { status = status, data01 = EXPNO } };
 
-
-            return new JsonResult { Data = new { status = status } };
+          
 
         }
 
