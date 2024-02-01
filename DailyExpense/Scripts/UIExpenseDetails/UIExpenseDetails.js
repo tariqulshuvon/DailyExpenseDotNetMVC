@@ -4,49 +4,39 @@ $(function () {
 
 
     $(document).ready(function () {
-
-
         $("#showToday").datepicker({ format: "dd-M-yyyy", autoclose: true });
         $("#showToday").datepicker("setDate", "1");
 
-
-
-
-        $('#myModal').validate({
+        $("#myModal form").validate({
             rules: {
-                txtName: {
-                    required: true
-                },
-                txtItem: {
-                    required: true
-                },
-                txtQty: {
-                    required: true,
-                    digits: true
-                },
-                txtRate: {
-                    required: true,
-                    number: true
-                }
+                txtName: "required",
+                txtItem: "required",
+                txtQty: "required",
+                txtRate: "required"
             },
             messages: {
                 txtName: {
-                    required: "Please enter your name"
+                    required: "Please enter Name"
                 },
                 txtItem: {
-                    required: "Please enter the item"
+                    required: "Please enter Item Name"
                 },
                 txtQty: {
-                    required: "Please enter the quantity",
-                    digits: "Please enter only digits"
+                    required: "Please enter Quantity"
                 },
                 txtRate: {
-                    required: "Please enter the rate",
-                    number: "Please enter a valid number"
+                    required: "Please enter Rate"
                 }
+            },
+            errorPlacement: function (error, element) {
+                error.addClass('errorMsq');
+
+                error.appendTo(element.parent());
             }
         });
     });
+
+
 
 
 
@@ -57,6 +47,11 @@ $(function () {
 
 
 });
+
+
+
+
+
 
 $("#btnModal").click(function () {
     $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
@@ -77,18 +72,35 @@ $("#btnModalExp").click(function () {
 
 
 
-
 $("#btnAddToTable").click(function () {
-    var name = $("#txtName").val();
-    var item = $("#txtItem").val();
-    var qty = $("#txtQty").val();
-    var rate = $("#txtRate").val();
-    if ((name, item, qty, rate) == '') {
-        ExpDetailsHelper.tblDataNotAddedSweetAlert();
-    } else {
-        ExpDetailsHelper.tblAddingSweetAlert();
+    if ($("#myModal form").valid()) {
+        var name = $("#txtName").val();
+        var item = $("#txtItem").val();
+        var qty = $("#txtQty").val();
+        var rate = $("#txtRate").val();
+        if (name === '' || item === '' || qty === '' || rate === '') {
+            $("#myModal form").validate();
+            ExpDetailsHelper.tblDataNotAddedSweetAlert();
+        } else {
+            ExpDetailsHelper.tblAddingSweetAlert();
+        }
     }
 });
+
+
+//$("#btnAddToTable").click(function () {
+
+//        var name = $("#txtName").val();
+//        var item = $("#txtItem").val();
+//        var qty = $("#txtQty").val();
+//        var rate = $("#txtRate").val();
+//        if ((name, item, qty, rate) == '') {
+//            ExpDetailsHelper.tblDataNotAddedSweetAlert();
+//        } else {
+//            ExpDetailsHelper.tblAddingSweetAlert();
+//        }
+    
+//});
 $("#btnClrModal").click(function () {
     ExpDetailsHelper.modalClearSweetAlert();
 });
@@ -137,19 +149,27 @@ var ExpDetailsHelper = {
 
                 }
             ],
-            //"footerCallback": function (row, data, start, end, display) {
-            //    var api = this.api();
-            //    var sum = api
-            //        .column(2, { page: 'current' })
-            //        .data()
-            //        .reduce(function (acc, val) {
-            //            return acc + parseFloat(val);
-            //        }, 0);
 
-            //    $(api.column(2).footer()).html('Total: ' + sum);
-            //}
+
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                var total = api
+                    .column(2)
+                    .data()
+                    .reduce(function (a, b) {
+                        return floatval(a) + floatval(b);
+                    }, 0);
+
+                total = total.toFixed(2);
+                // Update footer
+                $(api.column(2).footer()).html(
+                    +total
+                );
+            },
 
         });
+
     },
 
 
@@ -181,6 +201,8 @@ var ExpDetailsHelper = {
                     }
                 }
             ],
+
+
         });
     },
 
@@ -226,7 +248,6 @@ var ExpDetailsHelper = {
         table.row(rowId)
             .remove()
             .draw();
-        GPHelper.BuildItemTbl("");
     },
 
 
@@ -288,7 +309,7 @@ var ExpDetailsHelper = {
                     text: "Modal is not closed",
                     type: "error",
                     icon: "error",
-                    timer: 1500, 
+                    timer: 700, 
                     showConfirmButton: false 
                 });
             }
@@ -317,7 +338,7 @@ var ExpDetailsHelper = {
                     text: 'Data successfully Added to the table!',
                     type: "success",
                     icon: 'success',
-                    timer: 1000,
+                    timer: 500,
                     showConfirmButton: false
                 });
                 $("#txtName, #txtItem, #txtQty, #txtRate, #txtValue").val('');
@@ -327,7 +348,7 @@ var ExpDetailsHelper = {
                     text: 'Data did not Added to the table',
                     type: "error",
                     icon: 'error',
-                    timer: 1000,
+                    timer: 700,
                     showConfirmButton: false
                 });
             }
@@ -341,7 +362,7 @@ var ExpDetailsHelper = {
             text: 'Please Fill all the fields!',
             type: "error",
             icon: 'error',
-            timer: 1000,
+            timer: 500,
             showConfirmButton: false
         });
         $("#myModal").modal("show");
@@ -387,24 +408,56 @@ var ExpDetailsHelper = {
             );
         });
 
-        if ((name, item, qty, rate) != '') {
-            if (existingRow.length === 0) {
-                table.row.add({
-                    "SL": table.data().count() + 1,
+            if (existingRow.length > 0) {
+                var rowIndex = existingRow[0];
+                table.row(rowIndex).data({
+                    "SL": table.row(rowIndex).data().SL,
                     "Name": name,
                     "Item": item,
                     "Quantity": qty,
                     "Rate": rate,
                     "Value": value
-                }).draw(false);
+                }).draw();
+
+            } else {
+                if (existingRow.length === 0) {
+                    table.row.add({
+                        "SL": table.data().count() + 1,
+                        "Name": name,
+                        "Item": item,
+                        "Quantity": qty,
+                        "Rate": rate,
+                        "Value": value
+                    }).draw(false);
+                }
             }
-        }
         }
 
 
     },
 
 
+
+//    if(existingRow.length > 0) {
+//        var rowIndex = existingRow[0];
+//table.row(rowIndex).data({
+//    "SL": table.row(rowIndex).data().SL, // Assuming SL is the first column
+//    "Name": name,
+//    "Item": item,
+//    "Quantity": qty,
+//    "Rate": rate,
+//    "Value": value
+//}).draw(); // Redraw the table after updating data
+//    } else {
+//    table.row.add({
+//        "SL": table.data().count() + 1,
+//        "Name": name,
+//        "Item": item,
+//        "Quantity": qty,
+//        "Rate": rate,
+//        "Value": value
+//    }).draw(false);
+//}
     SaveCollectionData: function () {
 
         var obj = new Object();
@@ -440,7 +493,7 @@ var ExpDetailsHelper = {
                                 text: "Save Successfully",
                                 type: "success",
                                 closeOnConfirm: false,
-                                timer: 2000
+                                timer: 1000
 
                             });
                         } else {
@@ -449,7 +502,7 @@ var ExpDetailsHelper = {
                                 text: "Failed to save!",
                                 type: "error",
                                 closeOnConfirm: false,
-                                timer: 2000
+                                timer: 1000
                             });
                         }
                     },

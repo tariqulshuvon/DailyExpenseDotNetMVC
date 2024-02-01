@@ -4,6 +4,20 @@
     ViewBag.Title = "UIExpenseDetails";
 
 }
+
+<style type="text/css">
+    label.error {
+        font-weight: 300;
+        color: #F00;
+    }
+
+    .required:after {
+        color: #cc443d;
+        content: "*";
+        font-weight: bold;
+        padding-left: 1%;
+    }
+</style>
 <section>
 
     <div style="height:150px"></div>
@@ -16,11 +30,11 @@
             </div>
             <div class="col-lg-8">
                 <div class="row">
-                    <input type="hidden" class="form-control" id="txtExpNo" value="N"/>
+                    <input type="hidden" class="form-control" id="txtExpNo" value="N" />
                     <div class="col-lg-10">
                         <input type="text" class="form-control" id="showToday" autocomplete="off" style="width:30%; padding:4px; margin:4px; float:left;" placeholder="select date" />
                         <div>
-                            <input type="text" id="lblExpNo"  class="form-group" style="width:30%; padding:4px; margin:4px; float:right;" />
+                            <input type="text" id="lblExpNo" class="form-group" style="width:30%; padding:4px; margin:4px; float:right;" />
                         </div>
                     </div>
                     <div class="col-lg-2">
@@ -40,12 +54,23 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>Total Quantity:</th>
+                                <th>Total Rate:</th>
+                                <th>Total Value:</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
                 <div class="col-md" style="float:right">
                     <button id="btnSave" class="btn btn-danger" style="float:right">Save</button>
                 </div>
-                <div class="col-md" >
+                <div class="col-md">
                     <button id="btnModalExp" class="btn btn-primary" style="float:left">Saved Expenses</button>
 
                 </div>
@@ -68,69 +93,67 @@
                     <div>
                         <div class="row">
                             <div class="col-lg-12" style="text-align:left">
-                                <div style="padding-bottom:10px">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <input type="hidden" class="form-control" id="txtExpNo" />
-
-                                            <label for="txtName">Name: </label>
-                                            <input type="text" id="txtName" class="form-control" placeholder="Enter Name..." required  autocomplete="off"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="padding-bottom:10px">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <label for="txtItem">Item: </label>
-                                            <input type="text" id="txtItem" class="form-control" placeholder="Enter Item..." required autocomplete="off"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row" style="padding-bottom:10px">
-                                    <div class="col-lg-4">
+                                <form>
+                                    <div style="padding-bottom:10px">
                                         <div class="row">
                                             <div class="col-lg-12">
-                                                <label for="txtQty">Quantity: </label>
-                                                <input type="text" id="txtQty" class="form-control" placeholder="Enter Quantity..." style="text-align:end" required onkeypress="return ExpDetailsHelper.AllowNumbersOnly(event)" oninput="ExpDetailsHelper.calculateValue()" autocomplete="off"/>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4"></div>
-                                    <div class="col-lg-4">
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <label for="txtRate">Rate: </label>
-                                                <input type="text" id="txtRate" class="form-control" placeholder="Enter Rate..." style="text-align:end" required onkeypress="return ExpDetailsHelper.isDeciaml(this, event, 2)" oninput="ExpDetailsHelper.calculateValue()" autocomplete="off" />
+                                                <input type="hidden" class="form-control" id="txtExpNo" />
+                                                <label>Purchaser Name:</label><span class="required"></span>
+                                                <input type="text" id="txtName" class="form-control" placeholder="Enter Name..." required autocomplete="off" />
                                             </div>
                                         </div>
                                     </div>
-
-                                </div>
-                                <div style="padding-bottom:10px">
-                                    <div class="row">
+                                    <div style="padding-bottom:10px">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <label>Purchase Item: </label><span class="required"></span>
+                                                <input type="text" id="txtItem" class="form-control" placeholder="Enter Item..." required autocomplete="off" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="padding-bottom:10px">
                                         <div class="col-lg-4">
-                                            <label for="txtValue">Value: </label>
-                                            <input type="text" id="txtValue" class="form-control" style="text-align:end" readonly />
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <label>Quantity: </label><span class="required"></span>
+                                                    <input type="text" id="txtQty" class="form-control" placeholder="Enter Quantity..." style="text-align:end" required onkeypress="return ExpDetailsHelper.AllowNumbersOnly(event)" oninput="ExpDetailsHelper.calculateValue()" autocomplete="off" />
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4"></div>
+                                        <div class="col-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <label>Rate: </label><span class="required"></span>
+                                                    <input type="text" id="txtRate" class="form-control" placeholder="Enter Rate..." style="text-align:end" required onkeypress="return ExpDetailsHelper.isDeciaml(this, event, 2)" oninput="ExpDetailsHelper.calculateValue()" autocomplete="off" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                                    <div style="padding-bottom:10px">
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <label for="txtValue">Value: </label>
+                                                <input type="text" id="txtValue" class="form-control" style="text-align:end" readonly />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row"></div>
-                                <div class="col-lg-12">
-                                    <div style="padding-bottom:10px" class="col-lg-4">
-                                        <button class="btn btn-info" style="width:100%" id="btnAddToTable">Add to table</button>
+                                    <div class="row"></div>
+                                    <div class="col-lg-12">
+                                        <div style="padding-bottom:10px" class="col-lg-4">
+                                            <button class="btn btn-info" style="width:100%" id="btnAddToTable">Add to table</button>
+                                        </div>
+                                        <div style="padding-bottom:10px" class="col-lg-4">
+                                            <button class="btn btn-warning" style="width:100%" id="btnClrModal">Clear</button>
+                                        </div>
+                                        <div style="padding-bottom:10px" class="col-lg-4">
+                                            <button class="btn btn-danger" style="width:100%" id="btnCloseModal">Close</button>
+                                        </div>
                                     </div>
-                                    <div style="padding-bottom:10px" class="col-lg-4">
-                                        <button class="btn btn-warning" style="width:100%" id="btnClrModal">Clear</button>
-                                    </div>
-                                    <div style="padding-bottom:10px" class="col-lg-4">
-                                        <button class="btn btn-danger" style="width:100%" id="btnCloseModal">Close</button>
-                                    </div>
-                                </div>
-                                @*<div class="col-md-12">
-                                    <button class="btn btn-danger" style="width:100%" id="btnSaveToDb">Save To DB</button>
-
-                                </div>*@
+                                
                             </div>
                         </div>
 
@@ -164,6 +187,15 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th>Total:</th>
+                                    <th></th>
+
+                                </tr>
+                            </tfoot>
                         </table>
 
                     </div>
@@ -175,7 +207,9 @@
 
 @section Scripts {
     @Scripts.Render("~/Scripts/UIExpenseDetails/UIExpenseDetails.js");
+    @*<script src="~/Scripts/jquery-3.4.1.min.js"></script>*@
     <link href="~/Content/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
     <script src="~/Content/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Content/DataTables/datatables.min.js"></script>
 }
