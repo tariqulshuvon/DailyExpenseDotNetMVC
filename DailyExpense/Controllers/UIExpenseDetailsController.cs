@@ -43,7 +43,7 @@ namespace DailyExpense.Controllers
             DataSet dstrnd = new DataSet("dsExpList");
             dstrnd.Tables.Add(itemListdt);
 
-            ds = common.select_data_20X("", "SP_ENTRY_DailyExpDetails", "Save_ExpDetails", dstrnd, null, objDetails.SelectedDate, objDetails.expNo);
+            ds = common.select_data_20X("", "SP_ENTRY_DailyExpDetails", "Save_ExpDetails", dstrnd, null, objDetails.SelectedDate, objDetails.ExpNo);
                        
             if (ds.Tables[0].Rows.Count > 0)
             {

@@ -9,6 +9,6 @@ namespace BOL
     public class ExpDate
     {
         public string SelectedDate { get; set; }
-        public string expNo { get; set; }
+        public string ExpNo { get; set; }
     }
 }

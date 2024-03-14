@@ -6,6 +6,7 @@ $(function () {
     $(document).ready(function () {
         $("#showToday").datepicker({ format: "dd-M-yyyy", autoclose: true });
         $("#showToday").datepicker("setDate", "1");
+        $("#btnPrint").hide();
 
         $("#myModal form").validate({
             rules: {
@@ -101,6 +102,7 @@ $("#btnAddToTable").click(function () {
 //        }
     
 //});
+
 $("#btnClrModal").click(function () {
     ExpDetailsHelper.modalClearSweetAlert();
 });
@@ -111,6 +113,7 @@ $("#btnSave").click(function () {
 var ExpDetailsHelper = {
 
     GetExpenseDetailsList: function () {
+        $("#btnPrint").show();
 
         $.getJSON("../UIExpenseDetails/GetAllExpense")
             .done(function (data) {
@@ -150,9 +153,14 @@ var ExpDetailsHelper = {
                 }
             ],
 
-
             "footerCallback": function (row, data, start, end, display) {
                 var api = this.api(), data;
+                var floatval = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
 
                 var total = api
                     .column(2)
@@ -162,11 +170,11 @@ var ExpDetailsHelper = {
                     }, 0);
 
                 total = total.toFixed(2);
-                // Update footer
-                $(api.column(2).footer()).html(
+                $(api.column(2).footer()).html("Total: "
                     +total
                 );
             },
+
 
         });
 
@@ -202,6 +210,40 @@ var ExpDetailsHelper = {
                 }
             ],
 
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), data;
+                var floatval = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
+
+                var total = api
+                    .column(3)
+                    .data()
+                    .reduce(function (a, b) {
+                        return floatval(a) + floatval(b);
+                    }, 0);
+
+                total = total.toFixed(2);
+                $(api.column(3).footer()).html("Total Quantity: "
+                    + total
+                );
+
+                var total = api
+                    .column(5)
+                    .data()
+                    .reduce(function (a, b) {
+                        return floatval(a) + floatval(b);
+                    }, 0);
+
+                total = total.toFixed(2);
+                $(api.column(5).footer()).html("Total Value: "
+                    + total
+                );
+            },
+
 
         });
     },
@@ -229,7 +271,9 @@ var ExpDetailsHelper = {
 
                 var formattedDate = moment(data.Table[0].SelectedDate).format("DD-MMM-YYYY");
 
-                $("#showToday").val(formattedDate);
+                    $("#showToday").val(formattedDate);
+
+                    $("#lblExpNo").val(data.Table[0].ExpenseNo);
                     //$("#showToday").val(data.Table[0].SelectedDate).datepicker({ format: "dd-M-yyyy", autoclose: true });
                     ExpDetailsHelper.addToTable(data.Table);
                 } catch (error) {
@@ -358,12 +402,12 @@ var ExpDetailsHelper = {
     tblDataNotAddedSweetAlert: function () {
 
         swal({
-            title: 'Not Added!',
+            title: 'Sorry!',
             text: 'Please Fill all the fields!',
             type: "error",
             icon: 'error',
-            timer: 500,
-            showConfirmButton: false
+            closeOnConfirm: false
+
         });
         $("#myModal").modal("show");
     },
@@ -441,13 +485,13 @@ var ExpDetailsHelper = {
 //    if(existingRow.length > 0) {
 //        var rowIndex = existingRow[0];
 //table.row(rowIndex).data({
-//    "SL": table.row(rowIndex).data().SL, // Assuming SL is the first column
+//    "SL": table.row(rowIndex).data().SL, 
 //    "Name": name,
 //    "Item": item,
 //    "Quantity": qty,
 //    "Rate": rate,
 //    "Value": value
-//}).draw(); // Redraw the table after updating data
+//}).draw(); 
 //    } else {
 //    table.row.add({
 //        "SL": table.data().count() + 1,
@@ -462,7 +506,7 @@ var ExpDetailsHelper = {
 
         var obj = new Object();
         obj.SelectedDate = $("#showToday").val();
-        obj.expNo = $("#txtExpNo").val();
+        obj.ExpNo = $("#txtExpNo").val();
 
 
             var listitem = ExpDetailsHelper.CreateUnitObject();
@@ -471,7 +515,7 @@ var ExpDetailsHelper = {
                 var objItem= JSON.stringify(obj);
                 var newItemList = JSON.stringify(listitem);
                 var jsonParam = "objDetails:" + objItem + ',ItemList:' + newItemList;
-                console.log(jsonParam);
+                alert(jsonParam);
                 var serviceUrl = "/UIExpenseDetails/SaveAllData";
                 jQuery.ajax({
                     url: serviceUrl,
@@ -482,7 +526,7 @@ var ExpDetailsHelper = {
                     contentType: "application/json; charset=utf-8",
                     success: function (data) {
                         if (data.status) {
-                            //alert(data.data01);
+                            //alert(obj.ExpNo);
                             //var table = $('#tblExpD').DataTable();
                             //table.clear().draw();
                            
@@ -493,7 +537,7 @@ var ExpDetailsHelper = {
                                 text: "Save Successfully",
                                 type: "success",
                                 closeOnConfirm: false,
-                                timer: 1000
+                                timer: 700
 
                             });
                         } else {
@@ -502,7 +546,7 @@ var ExpDetailsHelper = {
                                 text: "Failed to save!",
                                 type: "error",
                                 closeOnConfirm: false,
-                                timer: 1000
+                                timer: 700
                             });
                         }
                     },
